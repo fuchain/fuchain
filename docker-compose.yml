@@ -2,13 +2,15 @@
 # SPDX-License-Identifier: (Apache-2.0 AND CC-BY-4.0)
 # Code is Apache-2.0 and docs are CC-BY-4.0
 
-version: '2.1'
+version: "2.1"
 
 services:
   # Build: docker-compose build -d bigchaindb
   # Run: docker-compose run -d bdb
   mongodb:
     image: mongo:3.6
+    volumes:
+      - ./mongodata:/data/db
     ports:
       - "27017:27017"
     command: mongod
@@ -43,17 +45,23 @@ services:
       - "9985:9985"
       - "26658"
     healthcheck:
-      test: ["CMD", "bash", "-c", "curl http://bigchaindb:9984 && curl http://tendermint:26657/abci_query"]
+      test:
+        [
+          "CMD",
+          "bash",
+          "-c",
+          "curl http://bigchaindb:9984 && curl http://tendermint:26657/abci_query",
+        ]
       interval: 3s
       timeout: 5s
       retries: 3
-    command: '.ci/entrypoint.sh'
+    command: ".ci/entrypoint.sh"
     restart: always
   tendermint:
     image: tendermint/tendermint:0.22.8
-    # volumes:
-    #   - ./tmdata:/tendermint
-    entrypoint: ''
+    volumes:
+      - ./tmdata:/tendermint
+    entrypoint: ""
     ports:
       - "26656:26656"
       - "26657:26657"
@@ -64,7 +72,6 @@ services:
     depends_on:
       bigchaindb:
         condition: service_healthy
-
 
   # curl client to check the health of development env
   curl-client:
@@ -99,6 +106,6 @@ services:
   vdocs:
     image: nginx
     ports:
-      - '33333:80'
+      - "33333:80"
     volumes:
       - ./docs/server/build/html:/usr/share/nginx/html
