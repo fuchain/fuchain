@@ -19,9 +19,7 @@ services:
     depends_on:
       - mongodb
       - tendermint
-    build:
-      context: .
-      dockerfile: Dockerfile-dev
+    image: fptudev/fuchain:latest
     volumes:
       - ./bigchaindb:/usr/src/app/bigchaindb
       - ./tests:/usr/src/app/tests
